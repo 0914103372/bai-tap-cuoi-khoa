@@ -63,17 +63,7 @@ document.querySelector('.formfix').querySelector(".buttonsubmit").addEventListen
             data[indexedit[0]][indexedit[1]].status = "todo"
             data[0].push(data[indexedit[0]][indexedit[1]])
             data[indexedit[0]].splice(indexedit[1],1)
-            let taskitem = document.querySelectorAll('.element_task')
-            taskitem.forEach((element) => {
-                element.innerHTML = ``
-            })
-            for(let i in data)
-            {
-        
-                data[i].forEach((element)=>{
-                    pushdatatohtml(element)
-                })
-            } 
+            reprint()
         }
     }
     else if(radio[1].checked)
@@ -236,9 +226,9 @@ function pushdatatohtml(element){
     let localhtmldoing=document.querySelector(".container_body_element_doing").querySelector('.element_task')
     let localhtmlcompleted=document.querySelector(".container_body_element_completed").querySelector('.element_task')
     let localhtmlblocked=document.querySelector(".container_body_element_blocked").querySelector('.element_task')
-        console.log(element)
+
         switch(element.status){
-            case 'todo':  localhtmltodo.innerHTML+= ` <div class="element_task_item">
+            case 'todo':  localhtmltodo.innerHTML+= ` <div class="element_task_item" draggable="true">
             <div class="element_task_item_header">
                 <div class="element_task_item_header_text" >${element.textheader}</div>
                 <div class="element_task_item_header_icon" >
@@ -254,7 +244,7 @@ function pushdatatohtml(element){
                     June 30, 2022
                 </div>
         </div>`  ;break;
-            case 'doing' :  localhtmldoing.innerHTML+= ` <div class="element_task_item">
+            case 'doing' :  localhtmldoing.innerHTML+= ` <div class="element_task_item" draggable="true">
             <div class="element_task_item_header">
                 <div class="element_task_item_header_text" >${element.textheader}</div>
                 <div class="element_task_item_header_icon" >
@@ -270,7 +260,7 @@ function pushdatatohtml(element){
                     June 30, 2022
                 </div>
         </div>` ; break;
-            case 'completed':  localhtmlcompleted.innerHTML+= ` <div class="element_task_item">
+            case 'completed':  localhtmlcompleted.innerHTML+= ` <div class="element_task_item" draggable="true">
             <div class="element_task_item_header">
                 <div class="element_task_item_header_text" >${element.textheader}</div>
                 <div class="element_task_item_header_icon" >
@@ -286,7 +276,7 @@ function pushdatatohtml(element){
                     June 30, 2022
                 </div>
         </div>`  ; break;
-            case 'blocked':  localhtmlblocked.innerHTML+= ` <div class="element_task_item">
+            case 'blocked':  localhtmlblocked.innerHTML+= ` <div class="element_task_item" draggable="true">
             <div class="element_task_item_header">
                 <div class="element_task_item_header_text" >${element.textheader}</div>
                 <div class="element_task_item_header_icon" >
@@ -414,6 +404,9 @@ function reprint()
     eventpen()
     eventtrash()
     taskSum()
+    dragdroptask()
+   
+    
 }
 function taskSum(){
     let todosum = document.querySelector(".container_body_element_todo").querySelector('.element_header_sum')
@@ -425,4 +418,161 @@ function taskSum(){
     let blockedsum = document.querySelector(".container_body_element_blocked").querySelector('.element_header_sum')
     blockedsum.innerHTML = data[3].length
 }
+function dropevent(a,b,c){
+    data[a][b].status ='doing'
+    data[c].push(data[a][b])
+    data[a].splice(i,1)
+    reprint()
+    for (let i = 0; i < taskstodo.length; i++) {
+        console.log(taskstodo[i].removeEventListener('drop',dropevent(a,b,c))) 
+    }
+}
+function dragdroptask()
+{
+    var todo = document.querySelector('.container_body_element_todo').querySelector('.element_task')
+    var doing = document.querySelector('.container_body_element_doing').querySelector('.element_task')
+    var completed = document.querySelector('.container_body_element_completed').querySelector('.element_task')
+    var blocked = document.querySelector('.container_body_element_blocked').querySelector('.element_task')
+    var taskstodo= todo.querySelectorAll('.element_task_item')
+    taskstodo.forEach((task,x) =>
+    {
+        task.addEventListener('dragstart',()=>{
+       
+            doing.addEventListener("dragover",(e)=>{
+            e.preventDefault()
+            })
+            doing.addEventListener("drop",(e)=>{
+            data[0][x].status ='doing'
+            data[1].push(data[0][x])
+            data[0].splice(x,1)      
+            reprint()
+            })
+            completed.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            completed.addEventListener("drop",()=>{
+                data[0][x].status ='completed'
+                data[2].push(data[0][x])
+                data[0].splice(x,1)
+                reprint()
+            })
+
+            blocked.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            blocked.addEventListener("drop",()=>{
+                data[0][x].status ='blocked'
+                data[3].push(data[0][x])
+                data[0].splice(x,1)
+                reprint()
+            })
+        })
+    })
+
+    let tasksdoing= doing.querySelectorAll('.element_task_item')
+    tasksdoing.forEach((task,x)=>{
+        task.addEventListener('dragstart',()=>{
+           
+            todo.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            todo.addEventListener("drop",()=>{
+                    data[1][x].status ='todo'
+                    data[0].push(data[1][x])
+                    data[1].splice(x,1)
+                    reprint()
+                   
+            })
+            completed.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            completed.addEventListener("drop",()=>{
+                data[1][x].status ='completed'
+                data[2].push(data[1][x])
+                data[1].splice(x,1)
+                reprint()
+            })
+            blocked.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            blocked.addEventListener("drop",()=>{
+                data[1][x].status ='blocked'
+                data[3].push(data[1][x])
+                data[1].splice(x,1)
+                reprint()
+            })
+        })
+    })
+    let taskscompleted= completed.querySelectorAll('.element_task_item')
+    taskscompleted.forEach((task,x)=>{
+        task.addEventListener('dragstart',()=>{
+           
+            doing.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            doing.addEventListener("drop",()=>{
+                    data[2][x].status ='doing'
+                    data[1].push(data[2][x])
+                    data[2].splice(x,1)
+                    reprint()
+                   
+            })
+            todo.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            todo.addEventListener("drop",()=>{
+                data[2][x].status ='todo'
+                data[0].push(data[2][x])
+                data[2].splice(x,1)
+                reprint()
+            })
+            blocked.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            blocked.addEventListener("drop",()=>{
+                data[2][x].status ='blocked'
+                data[3].push(data[2][x])
+                data[2].splice(x,1)
+                reprint()
+            })
+        })
+    })
+    let tasksblocked= blocked.querySelectorAll('.element_task_item')
+    tasksblocked.forEach((task,x)=>{
+        task.addEventListener('dragstart',()=>{
+           
+            doing.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            doing.addEventListener("drop",()=>{
+                    data[3][x].status ='doing'
+                    data[1].push(data[3][x])
+                    data[2].splice(x,1)
+                    reprint()
+                   
+            })
+            todo.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            todo.addEventListener("drop",()=>{
+                data[3][x].status ='todo'
+                data[0].push(data[3][x])
+                data[3].splice(x,1)
+                reprint()
+            })
+            completed.addEventListener("dragover",(e)=>{
+                e.preventDefault()
+            })
+            completed.addEventListener("drop",()=>{
+                data[3][x].status ='completed'
+                data[2].push(data[3][x])
+                data[3].splice(x,1)
+                reprint()
+            })
+        })
+    })
+    
+}   
+
+
 
