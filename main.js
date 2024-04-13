@@ -192,20 +192,18 @@ function addNewTask()
 {
     let input = document.querySelector('.formnewtask').querySelectorAll('input')
     let textarea =document.querySelector('.formnewtask').querySelector('textarea')
-    let Month = ["January","February","March","April","May","June"]
+
     let now = new Date()
     var x = {
         textheader: input[0].value,
         title: input[1].value,
         content: textarea.value,
         status: "todo",
-        time: ""+(now.getMonth()+1)+" "+now.getDay()+", "+now.getFullYear(),
+        time: "April"+" "+now.getDate()+", "+now.getFullYear(),
     }
     data[0].push(x)
-    pushdatatohtml(x)
-    eventpen()
-    eventtrash()
-    taskSum()
+    console.log(x.time)
+    reprint()
     hiddenFormAdd('none')
     alert('Submit Thành Công')
     //lamrongonhap
@@ -241,7 +239,7 @@ function pushdatatohtml(element){
             <div class="element_task_item_content">${element.content}</div>
             <div class="element_task_item_time">
                 <i class="fa-regular fa-clock"></i>
-                    June 30, 2022
+                    ${element.time}
                 </div>
         </div>`  ;break;
             case 'doing' :  localhtmldoing.innerHTML+= ` <div class="element_task_item" draggable="true">
@@ -257,7 +255,7 @@ function pushdatatohtml(element){
             <div class="element_task_item_content">${element.content}</div>
             <div class="element_task_item_time">
                 <i class="fa-regular fa-clock"></i>
-                    June 30, 2022
+                ${element.time}
                 </div>
         </div>` ; break;
             case 'completed':  localhtmlcompleted.innerHTML+= ` <div class="element_task_item" draggable="true">
@@ -271,9 +269,9 @@ function pushdatatohtml(element){
             <div class="element_task_item_title">${element.title}</div>
             <div class="element__task_item_line"></div>
             <div class="element_task_item_content">${element.content}</div>
-            <div class="element_task_item_time">
+            <div class="element_task_item_time">0-999
                 <i class="fa-regular fa-clock"></i>
-                    June 30, 2022
+                   ${element.time}
                 </div>
         </div>`  ; break;
             case 'blocked':  localhtmlblocked.innerHTML+= ` <div class="element_task_item" draggable="true">
@@ -289,7 +287,7 @@ function pushdatatohtml(element){
             <div class="element_task_item_content">${element.content}</div>
             <div class="element_task_item_time">
                 <i class="fa-regular fa-clock"></i>
-                    June 30, 2022
+                    ${element.time}
                 </div>
         </div>` ; break;
         default: break;
@@ -390,6 +388,7 @@ function eventtrash()
 }
 function reprint()
 {
+    fixbug()
     let taskitem = document.querySelectorAll('.element_task')
             taskitem.forEach((element) => {
                 element.innerHTML = ``
@@ -405,7 +404,7 @@ function reprint()
     eventtrash()
     taskSum()
     dragdroptask()
-   
+
     
 }
 function taskSum(){
@@ -418,15 +417,9 @@ function taskSum(){
     let blockedsum = document.querySelector(".container_body_element_blocked").querySelector('.element_header_sum')
     blockedsum.innerHTML = data[3].length
 }
-function dropevent(a,b,c){
-    data[a][b].status ='doing'
-    data[c].push(data[a][b])
-    data[a].splice(i,1)
-    reprint()
-    for (let i = 0; i < taskstodo.length; i++) {
-        console.log(taskstodo[i].removeEventListener('drop',dropevent(a,b,c))) 
-    }
-}
+
+
+
 function dragdroptask()
 {
     var todo = document.querySelector('.container_body_element_todo').querySelector('.element_task')
@@ -439,12 +432,13 @@ function dragdroptask()
         task.addEventListener('dragstart',()=>{
        
             doing.addEventListener("dragover",(e)=>{
-            e.preventDefault()
+            e.preventDefault()        
             })
             doing.addEventListener("drop",(e)=>{
             data[0][x].status ='doing'
             data[1].push(data[0][x])
             data[0].splice(x,1)      
+            
             reprint()
             })
             completed.addEventListener("dragover",(e)=>{
@@ -454,6 +448,7 @@ function dragdroptask()
                 data[0][x].status ='completed'
                 data[2].push(data[0][x])
                 data[0].splice(x,1)
+         
                 reprint()
             })
 
@@ -464,6 +459,7 @@ function dragdroptask()
                 data[0][x].status ='blocked'
                 data[3].push(data[0][x])
                 data[0].splice(x,1)
+             
                 reprint()
             })
         })
@@ -547,7 +543,7 @@ function dragdroptask()
             doing.addEventListener("drop",()=>{
                     data[3][x].status ='doing'
                     data[1].push(data[3][x])
-                    data[2].splice(x,1)
+                    data[3].splice(x,1)
                     reprint()
                    
             })
@@ -572,7 +568,61 @@ function dragdroptask()
         })
     })
     
-}   
 
+} 
+function fixbug(){
+    data[3].forEach((e)=>{
+        e.status="blocked"
+    })
+    data[2].forEach((e)=>{
+        e.status="completed"
+    })
+    data[1].forEach((e)=>{
+        e.status="doing"
+    })
+    data[0].forEach((e)=>{
+        e.status="todo"
+    })
+    var todo = document.querySelector('.container_body_element_todo')
+    var doing = document.querySelector('.container_body_element_doing')
+    var completed = document.querySelector('.container_body_element_completed')
+    var blocked = document.querySelector('.container_body_element_blocked')
+    todo.innerHTML =``
+    todo.innerHTML =` <div class="element_header">
+    <div class="element_header_text">Todo</div>  
+    <div class="element_header_sum">0</div>
+</div>
+<div class="element_line"></div>
+<div class="element_task">
+  
+</div>`
+doing.innerHTML =``
+doing.innerHTML =` <div class="element_header">
+<div class="element_header_text">Doing</div>  
+<div class="element_header_sum">0</div>
+</div>
+<div class="element_line"></div>
+<div class="element_task">
+
+</div>`
+completed.innerHTML =``
+completed.innerHTML =` <div class="element_header">
+<div class="element_header_text">Completed</div>  
+<div class="element_header_sum">0</div>
+</div>
+<div class="element_line"></div>
+<div class="element_task">
+
+</div>`
+blocked.innerHTML =``
+blocked.innerHTML =` <div class="element_header">
+<div class="element_header_text">Blocked</div>  
+<div class="element_header_sum">0</div>
+</div>
+<div class="element_line"></div>
+<div class="element_task">
+
+</div>`
+}
 
 
